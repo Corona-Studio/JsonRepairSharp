@@ -1,6 +1,7 @@
 ﻿using System.Collections.Frozen;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using JsonRepairSharp.Class.Helpers;
 
 namespace JsonRepairSharp.Class;
@@ -279,7 +280,7 @@ public partial class JsonRepairCore
                 var truncatedText = _i >= _text.Length;
                 if (!processedColon)
                 {
-                    if (StringHelper.IsStartOfValue(_text[_i].ToString()) || truncatedText)
+                    if (_i < _text.Length && StringHelper.IsStartOfValue(_text[_i].ToString()) || truncatedText)
                         // repair missing colon
                         _output = StringHelper.InsertBeforeLastWhitespace(_output, ":");
                     else
@@ -420,7 +421,7 @@ public partial class JsonRepairCore
     /// </summary>
     private bool ParseString(bool stopAtDelimiter = false, int stopAtIndex = -1)
     {
-        var skipEscapeChars = _text[_i] == '\\';
+        var skipEscapeChars = _i < _text.Length && _text[_i] == '\\';
         if (skipEscapeChars)
         {
             // repair: remove the first escape character
@@ -428,7 +429,7 @@ public partial class JsonRepairCore
             skipEscapeChars = true;
         }
 
-        if (StringHelper.IsQuote(_text[_i]))
+        if (_i < _text.Length && StringHelper.IsQuote(_text[_i]))
         {
             // double quotes are correct JSON,
             // single quotes come from JavaScript for example, we assume it will have a correct single end quote too
@@ -573,7 +574,7 @@ public partial class JsonRepairCore
                     else if (nextChar == 'u')
                     {
                         var j = 2;
-                        while (j < 6 && StringHelper.IsHex(_text[_i + j])) j++;
+                        while (_i + j < _text.Length && j < 6 && StringHelper.IsHex(_text[_i + j])) j++;
 
                         if (j == 6)
                         {
@@ -642,7 +643,7 @@ public partial class JsonRepairCore
         var processed = false;
 
         ParseWhitespaceAndSkipComments();
-        while (_text[_i] == StringHelper.CodePlus)
+        while (_i < _text.Length && _text[_i] == StringHelper.CodePlus)
         {
             processed = true;
             _i++;
@@ -669,7 +670,7 @@ public partial class JsonRepairCore
     private bool ParseNumber()
     {
         var start = _i;
-        if (_text[_i] == StringHelper.CodeMinus)
+        if (_i < _text.Length && _text[_i] == StringHelper.CodeMinus)
         {
             _i++;
             if (AtEndOfNumber())
@@ -689,9 +690,9 @@ public partial class JsonRepairCore
         // We will allow all leading zeros here though and at the end of ParseNumber
         // check against trailing zeros and repair that if needed.
         // Leading zeros can have meaning, so we should not clear them.
-        while (StringHelper.IsDigit(_text[_i])) _i++;
+        while (_i < _text.Length && StringHelper.IsDigit(_text[_i])) _i++;
 
-        if (_text[_i] == StringHelper.CodeDot)
+        if (_i < _text.Length && _text[_i] == StringHelper.CodeDot)
         {
             _i++;
             if (AtEndOfNumber())
@@ -706,13 +707,13 @@ public partial class JsonRepairCore
                 return false;
             }
 
-            while (StringHelper.IsDigit(_text[_i])) _i++;
+            while (_i < _text.Length && StringHelper.IsDigit(_text[_i])) _i++;
         }
 
-        if (_text[_i] == StringHelper.CodeLowercaseE || _text[_i] == StringHelper.CodeUppercaseE)
+        if (_i < _text.Length && (_text[_i] == StringHelper.CodeLowercaseE || _text[_i] == StringHelper.CodeUppercaseE))
         {
             _i++;
-            if (_text[_i] == StringHelper.CodeMinus || _text[_i] == StringHelper.CodePlus) _i++;
+            if (_i < _text.Length && (_text[_i] == StringHelper.CodeMinus || _text[_i] == StringHelper.CodePlus)) _i++;
 
             if (AtEndOfNumber())
             {
@@ -726,7 +727,7 @@ public partial class JsonRepairCore
                 return false;
             }
 
-            while (StringHelper.IsDigit(_text[_i])) _i++;
+            while (_i < _text.Length && StringHelper.IsDigit(_text[_i])) _i++;
         }
 
         // if we're not at the end of the number by this point, allow this to be parsed as another type
@@ -766,7 +767,7 @@ public partial class JsonRepairCore
 
     private bool ParseKeyword(string name, string value)
     {
-        if (_text.Substring(_i, name.Length) == name)
+        if (StringHelper.Slice(_text, _i, _i + name.Length) == name)
         {
             _output += value;
             _i += name.Length;
@@ -787,14 +788,14 @@ public partial class JsonRepairCore
         // also, note that we allow strings to contain a slash / in order to support repairing regular expressions
         var start = _i;
 
-        if (StringHelper.RegexFunctionNameCharStart().IsMatch(_text[_i].ToString()))
+        if (_i < _text.Length && StringHelper.RegexFunctionNameCharStart().IsMatch(_text[_i].ToString()))
         {
             while (_i < _text.Length && StringHelper.RegexFunctionNameChar().IsMatch(_text[_i].ToString())) _i++;
 
             var j = _i;
-            while (StringHelper.IsWhitespace(_text[j])) j++;
+            while (j < _text.Length && StringHelper.IsWhitespace(_text[j])) j++;
 
-            if (_text[j] == '(')
+            if (j < _text.Length && _text[j] == '(')
             {
                 // repair a MongoDB function call like NumberLong("2")
                 // repair a JSONP function call like callback({...});
@@ -824,8 +825,10 @@ public partial class JsonRepairCore
             _i++;
 
         // test start of an url like "https://..." (this would be parsed as a comment)
-        if (_text[_i - 1] == StringHelper.CodeColon &&
-            StringHelper.RegexUrlStart().IsMatch(_text.Substring(start, _i + 2 - start)))
+        if (_i - 1 < _text.Length &&
+            _text[_i - 1] == StringHelper.CodeColon &&
+            start < _text.Length &&
+            StringHelper.RegexUrlStart().IsMatch(_text.AsSpan(start, _i + 2 - start)))
             while (_i < _text.Length && StringHelper.RegexUrlChar().IsMatch(_text[_i].ToString()))
                 _i++;
 
@@ -840,7 +843,7 @@ public partial class JsonRepairCore
             var symbol = _text.Substring(start, _i - start);
             _output += symbol == "undefined" ? "null" : JsonSerializer.Serialize(symbol);
 
-            if (_text[_i] == StringHelper.CodeDoubleQuote)
+            if (_i < _text.Length && _text[_i] == StringHelper.CodeDoubleQuote)
                 // we had a missing start quote, but now we encountered the end quote, so we can skip that one
                 _i++;
 
@@ -852,7 +855,7 @@ public partial class JsonRepairCore
 
     private bool ParseRegex()
     {
-        if (_text[_i] == '/')
+        if (_i < _text.Length && _text[_i] == '/')
         {
             var start = _i;
             _i++;

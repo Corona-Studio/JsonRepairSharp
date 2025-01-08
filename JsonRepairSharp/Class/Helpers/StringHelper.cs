@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace JsonRepairSharp.Class.Helpers;
 
@@ -47,6 +48,17 @@ public static partial class StringHelper
     private const char CodeQuoteRight = (char)0x2019; // ’
     private const char CodeGraveAccent = (char)0x0060; // `
     private const char CodeAcuteAccent = (char)0x00b4; // ´
+
+    public static string Slice(string str, int startIndex, int endIndex)
+    {
+        if (startIndex == endIndex) return string.Empty;
+
+        var slice = endIndex >= str.Length
+        ? str
+        : str.Substring(startIndex, endIndex - startIndex);
+
+        return slice;
+    }
 
     public static bool IsHex(int code)
     {
