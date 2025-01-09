@@ -1,4 +1,4 @@
-# JsonRepairSharp
+# JsonRepairSharp [![CodeQL Advanced](https://github.com/Corona-Studio/JsonRepairSharp/actions/workflows/codeql.yml/badge.svg)](https://github.com/Corona-Studio/JsonRepairSharp/actions/workflows/codeql.yml)
 
 Repair invalid JSON documents.
 
