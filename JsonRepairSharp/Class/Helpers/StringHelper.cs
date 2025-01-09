@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using System.Xml.Linq;
 
 namespace JsonRepairSharp.Class.Helpers;
 
@@ -60,14 +59,14 @@ public static partial class StringHelper
         return slice;
     }
 
-    public static bool IsHex(int code)
+    public static bool IsHex(char code)
     {
         return code is >= CodeZero and <= CodeNine
             or >= CodeUppercaseA and <= CodeUppercaseF
             or >= CodeLowercaseA and <= CodeLowercaseF;
     }
 
-    public static bool IsDigit(int code)
+    public static bool IsDigit(char code)
     {
         return code is >= CodeZero and <= CodeNine;
     }
@@ -92,7 +91,7 @@ public static partial class StringHelper
         return RegexStartOfValue().IsMatch(ch ?? string.Empty) || (ch != null && IsQuote(ch[0]));
     }
 
-    public static bool IsControlCharacter(int code)
+    public static bool IsControlCharacter(char code)
     {
         return code is CodeNewline or CodeReturn or CodeTab or CodeBackspace or CodeFormFeed;
     }
@@ -100,7 +99,7 @@ public static partial class StringHelper
     /// <summary>
     /// Check if the given character is a whitespace character like space, tab, or newline
     /// </summary>
-    public static bool IsWhitespace(int code)
+    public static bool IsWhitespace(char code)
     {
         return code is CodeSpace or CodeNewline or CodeTab or CodeReturn;
     }
@@ -109,7 +108,7 @@ public static partial class StringHelper
     /// Check if the given character is a whitespace character like space or tab,
     /// but NOT a newline
     /// </summary>
-    public static bool IsWhitespaceExceptNewline(int code)
+    public static bool IsWhitespaceExceptNewline(char code)
     {
         return code is CodeSpace or CodeTab or CodeReturn;
     }
@@ -117,7 +116,7 @@ public static partial class StringHelper
     /// <summary>
     /// Check if the given character is a special whitespace character, some unicode variant
     /// </summary>
-    public static bool IsSpecialWhitespace(int code)
+    public static bool IsSpecialWhitespace(char code)
     {
         return code is CodeNonBreakingSpace
             or >= CodeEnQuad and <= CodeHairSpace
@@ -130,7 +129,7 @@ public static partial class StringHelper
     /// Test whether the given character is a quote or double quote character.
     /// Also tests for special variants of quotes.
     /// </summary>
-    public static bool IsQuote(int code)
+    public static bool IsQuote(char code)
     {
         return IsDoubleQuoteLike(code) || IsSingleQuoteLike(code);
     }
@@ -139,7 +138,7 @@ public static partial class StringHelper
     /// Test whether the given character is a double quote character.
     /// Also tests for special variants of double quotes.
     /// </summary>
-    public static bool IsDoubleQuoteLike(int code)
+    public static bool IsDoubleQuoteLike(char code)
     {
         return code is CodeDoubleQuote or CodeDoubleQuoteLeft or CodeDoubleQuoteRight;
     }
@@ -148,7 +147,7 @@ public static partial class StringHelper
     /// Test whether the given character is a double quote character.
     /// Does NOT test for special variants of double quotes.
     /// </summary>
-    public static bool IsDoubleQuote(int code)
+    public static bool IsDoubleQuote(char code)
     {
         return code == CodeDoubleQuote;
     }
@@ -157,7 +156,7 @@ public static partial class StringHelper
     /// Test whether the given character is a single quote character.
     /// Also tests for special variants of single quotes.
     /// </summary>
-    public static bool IsSingleQuoteLike(int code)
+    public static bool IsSingleQuoteLike(char code)
     {
         return code is CodeQuote or CodeQuoteLeft or CodeQuoteRight or CodeGraveAccent or CodeAcuteAccent;
     }
@@ -166,7 +165,7 @@ public static partial class StringHelper
     /// Test whether the given character is a single quote character.
     /// Does NOT test for special variants of single quotes.
     /// </summary>
-    public static bool IsSingleQuote(int code)
+    public static bool IsSingleQuote(char code)
     {
         return code == CodeQuote;
     }
