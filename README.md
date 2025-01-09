@@ -4,9 +4,24 @@ Repair invalid JSON documents.
 
 This is the C# version of the original project: [https://github.com/josdejong/jsonrepair](https://github.com/josdejong/jsonrepair)
 
-Read the background article "How to fix JSON and validate it with ease"
+Read the background article ["How to fix JSON and validate it with ease"](https://jsoneditoronline.org/indepth/parse/fix-json/)
 
-The following issues can be fixed:
+## How to use?
+
+```csharp
+using JsonRepairSharp.Class;
+
+// ...
+
+var fixedJson = JsonRepairCore.JsonRepair(rawJson);
+
+// ...
+
+```
+
+You can also catch the `JsonRepairError` exception to handle the case where the library failed to fix the JSON.
+
+## Items to fix
 
 - Add missing quotes around keys
 - Add missing escape characters
