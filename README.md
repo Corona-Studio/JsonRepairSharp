@@ -1,4 +1,4 @@
-# JsonRepairSharp [![CodeQL Advanced](https://github.com/Corona-Studio/JsonRepairSharp/actions/workflows/codeql.yml/badge.svg)](https://github.com/Corona-Studio/JsonRepairSharp/actions/workflows/codeql.yml)
+# JsonRepairSharp [![CodeQL Advanced](https://github.com/Corona-Studio/JsonRepairSharp/actions/workflows/codeql.yml/badge.svg)](https://github.com/Corona-Studio/JsonRepairSharp/actions/workflows/codeql.yml) [![.NET](https://github.com/Corona-Studio/JsonRepairSharp/actions/workflows/dotnet-tests.yml/badge.svg)](https://github.com/Corona-Studio/JsonRepairSharp/actions/workflows/dotnet-tests.yml)
 
 Repair invalid JSON documents.
 
