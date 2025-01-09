@@ -4,14 +4,6 @@ namespace JsonRepairSharp.Tests;
 
 public class ParseTests
 {
-    private JsonRepairCore _core = null!;
-
-    [SetUp]
-    public void Setup()
-    {
-        _core = new JsonRepairCore();
-    }
-
     [Test]
     public void ParseWhitespaceTest()
     {
@@ -91,11 +83,11 @@ public class ParseTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(_core.JsonRepair("\"★\""), Is.EqualTo("\"★\""));
-            Assert.That(_core.JsonRepair("\"\u2605\""), Is.EqualTo("\"\u2605\""));
-            Assert.That(_core.JsonRepair("\"😀\""), Is.EqualTo("\"😀\""));
-            Assert.That(_core.JsonRepair("\"\ud83d\ude00\""), Is.EqualTo("\"\ud83d\ude00\""));
-            Assert.That(_core.JsonRepair("\"йнформация\""), Is.EqualTo("\"йнформация\""));
+            Assert.That(JsonRepairCore.JsonRepair("\"★\""), Is.EqualTo("\"★\""));
+            Assert.That(JsonRepairCore.JsonRepair("\"\u2605\""), Is.EqualTo("\"\u2605\""));
+            Assert.That(JsonRepairCore.JsonRepair("\"😀\""), Is.EqualTo("\"😀\""));
+            Assert.That(JsonRepairCore.JsonRepair("\"\ud83d\ude00\""), Is.EqualTo("\"\ud83d\ude00\""));
+            Assert.That(JsonRepairCore.JsonRepair("\"йнформация\""), Is.EqualTo("\"йнформация\""));
         });
     }
 
@@ -104,10 +96,10 @@ public class ParseTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(_core.JsonRepair("\"\\u2605\""), Is.EqualTo("\"\\u2605\""));
-            Assert.That(_core.JsonRepair("\"\\u2605A\""), Is.EqualTo("\"\\u2605A\""));
-            Assert.That(_core.JsonRepair("\"\\ud83d\\ude00\""), Is.EqualTo("\"\\ud83d\\ude00\""));
-            Assert.That(_core.JsonRepair("\"\\u0439\\u043d\\u0444\\u043e\\u0440\\u043c\\u0430\\u0446\\u0438\\u044f\""),
+            Assert.That(JsonRepairCore.JsonRepair("\"\\u2605\""), Is.EqualTo("\"\\u2605\""));
+            Assert.That(JsonRepairCore.JsonRepair("\"\\u2605A\""), Is.EqualTo("\"\\u2605A\""));
+            Assert.That(JsonRepairCore.JsonRepair("\"\\ud83d\\ude00\""), Is.EqualTo("\"\\ud83d\\ude00\""));
+            Assert.That(JsonRepairCore.JsonRepair("\"\\u0439\\u043d\\u0444\\u043e\\u0440\\u043c\\u0430\\u0446\\u0438\\u044f\""),
                 Is.EqualTo("\"\\u0439\\u043d\\u0444\\u043e\\u0440\\u043c\\u0430\\u0446\\u0438\\u044f\""));
         });
     }
@@ -117,15 +109,15 @@ public class ParseTests
     {
         Assert.Multiple(() =>
         {
-            Assert.That(_core.JsonRepair("{\"★\":true}"), Is.EqualTo("{\"★\":true}"));
-            Assert.That(_core.JsonRepair("{\"\u2605\":true}"), Is.EqualTo("{\"\u2605\":true}"));
-            Assert.That(_core.JsonRepair("{\"😀\":true}"), Is.EqualTo("{\"😀\":true}"));
-            Assert.That(_core.JsonRepair("{\"\ud83d\ude00\":true}"), Is.EqualTo("{\"\ud83d\ude00\":true}"));
+            Assert.That(JsonRepairCore.JsonRepair("{\"★\":true}"), Is.EqualTo("{\"★\":true}"));
+            Assert.That(JsonRepairCore.JsonRepair("{\"\u2605\":true}"), Is.EqualTo("{\"\u2605\":true}"));
+            Assert.That(JsonRepairCore.JsonRepair("{\"😀\":true}"), Is.EqualTo("{\"😀\":true}"));
+            Assert.That(JsonRepairCore.JsonRepair("{\"\ud83d\ude00\":true}"), Is.EqualTo("{\"\ud83d\ude00\":true}"));
         });
     }
 
     private void AssertRepair(string text)
     {
-        Assert.That(_core.JsonRepair(text), Is.EqualTo(text));
+        Assert.That(JsonRepairCore.JsonRepair(text), Is.EqualTo(text));
     }
 }

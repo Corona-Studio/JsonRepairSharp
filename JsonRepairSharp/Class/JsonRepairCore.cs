@@ -424,7 +424,7 @@ public static partial class JsonRepairCore
     /// </summary>
     private static bool ParseString(RepairDataHolder data, bool stopAtDelimiter = false, int stopAtIndex = -1)
     {
-        var skipEscapeChars = data.Index < data.Text.Length && data.CurrentChar == '\\';
+        var skipEscapeChars = data.Index < data.Text.Length && data.CurrentChar == StringHelper.CodeBackslash;
         if (skipEscapeChars)
         {
             // repair: remove the first escape character
@@ -510,7 +510,7 @@ public static partial class JsonRepairCore
                     }
 
                     var iPrevChar = PrevNonWhitespaceIndex(data, iQuote - 1);
-                    var prevChar = data.Text[iPrevChar];
+                    var prevChar = data.CharAt(iPrevChar);
 
                     if (prevChar == ',')
                     {
@@ -547,9 +547,8 @@ public static partial class JsonRepairCore
                     // because there is an end quote missing
 
                     // test start of an url like "https://..." (this would be parsed as a comment)
-                    if (data.CharAt(data.Index - 1) == ':' &&
-                        StringHelper.RegexUrlStart().IsMatch(data.Text.AsSpan(iBefore + 1,
-                            Math.Min(data.Index + 2 - (iBefore + 1), data.Text.Length - (iBefore + 1)))))
+                    if (data.CharAt(data.Index - 1) == StringHelper.CodeColon &&
+                        StringHelper.RegexUrlStart().IsMatch(data.Text.AsSpan(iBefore + 1, data.Index - iBefore + 1)))
                         while (data.Index < data.Text.Length &&
                                StringHelper.RegexUrlChar().IsMatch(data.CurrentChar.ToString()))
                         {
@@ -565,10 +564,10 @@ public static partial class JsonRepairCore
 
                     return true;
                 }
-                else if (data.CurrentChar == '\\')
+                else if (data.CurrentChar == StringHelper.CodeBackslash)
                 {
                     // handle escaped content like \n or \u2605
-                    var nextChar = data.CharAt(data.Index - 1);
+                    var nextChar = data.CharAt(data.Index + 1);
 
                     if (EscapeCharacters.TryGetValue(nextChar, out _))
                     {
