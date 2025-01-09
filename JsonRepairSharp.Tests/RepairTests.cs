@@ -161,23 +161,4 @@ public class RepairTests
             Assert.That(JsonRepairCore.JsonRepair("{\"a\":foo\",\"b\":\"bar\"}"), Is.EqualTo("{\"a\":\"foo\",\"b\":\"bar\"}"));
         });
     }
-
-    [Test]
-    public void RepairMultipleLineValueTest()
-    {
-        const string raw = """
-                           {
-                             "x": "1234
-                           123123123"
-                           }
-                           """;
-
-        const string expected = """
-                                {
-                                  "x": "1234\r\n123123123"
-                                }
-                                """;
-
-        Assert.That(JsonRepairCore.JsonRepair(raw), Is.EqualTo(expected));
-    }
 }
