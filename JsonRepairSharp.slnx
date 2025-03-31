@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="JsonRepairSharp.Tests/JsonRepairSharp.Tests.csproj" />
+  <Project Path="JsonRepairSharp/JsonRepairSharp.csproj" />
+</Solution>
